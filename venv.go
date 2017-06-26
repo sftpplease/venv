@@ -8,11 +8,16 @@ import (
 )
 
 type File interface {
+	Name() string
+	Chmod(mode os.FileMode) error
 	Read(buf []byte) (int, error)
 	Readdir(n int) ([]os.FileInfo, error)
+	Readdirnames(n int) ([]string, error)
+	Truncate(size int64) error
 	Write(buf []byte) (int, error)
 	WriteAt(buf []byte, off int64) (int, error)
 	Stat() (os.FileInfo, error)
+	Sync() error
 	Close() error
 }
 
@@ -21,7 +26,10 @@ type Os struct {
 	Stdin  io.ReadCloser
 	Stdout io.WriteCloser
 	Stderr io.WriteCloser
+	Chmod func(name string, mode os.FileMode) error
 	Open   func(path string) (File, error)
+	OpenFile func(name string, flag int, perm os.FileMode) (File, error)
+	Mkdir   func(path string, perm os.FileMode) error
 	Stat   func(path string) (os.FileInfo, error)
 	Exit   func(code int)
 }
