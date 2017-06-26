@@ -6,21 +6,19 @@ import (
 	"github.com/sftpplease/venv"
 )
 
-type Passthrough struct{}
-
-func (pt *Passthrough) Open(path string) (venv.File, error) {
+func open(path string) (venv.File, error) {
 	f, err := os.Open(path)
 	return f, err
 }
 
-func (pt *Passthrough) Stat(path string) (os.FileInfo, error) {
-	return os.Stat(path)
-}
-
-func (pt *Passthrough) Exit(code int) {
-	os.Exit(code)
-}
-
-func New() venv.VOS {
-	return &Passthrough{}
+func PassthroughOS() *venv.Os {
+	return &venv.Os{
+		Args:   os.Args,
+		Stdin:  os.Stdin,
+		Stdout: os.Stdout,
+		Stderr: os.Stderr,
+		Open:   open,
+		Stat:   os.Stat,
+		Exit:   os.Exit,
+	}
 }
